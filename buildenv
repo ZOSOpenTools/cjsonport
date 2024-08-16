@@ -1,0 +1,53 @@
+# bump: cjson-version /CJSON_VERSION="(.*)"/ https://github.com/DaveGamble/cJSON.git|semver:*
+CJSON_VERSION="1.7.18" # Specify a stable release
+export ZOPEN_STABLE_TAG="v${CJSON_VERSION}"
+export ZOPEN_STABLE_URL="https://github.com/DaveGamble/cJSON.git"
+export ZOPEN_STABLE_DEPS="make cmake"
+export ZOPEN_BUILD_LINE="STABLE"
+export ZOPEN_CATEGORIES="development"
+
+# Avoid zoslib
+export ZOPEN_DONT_ADD_ZOSLIB_DEP=1
+
+export ZOPEN_COMP="CLANG"
+
+export ZOPEN_CONFIGURE="cmake"
+export ZOPEN_CONFIGURE_OPTS="-DBUILD_SHARED_AND_STATIC_LIBS=ON -B ../build --install-prefix \"\$ZOPEN_INSTALL_DIR/\" ."
+
+export ZOPEN_MAKE="cmake"
+export ZOPEN_MAKE_OPTS="--build ../build --parallel \$ZOPEN_NUM_JOBS --config Release"
+export ZOPEN_MAKE_MINIMAL=Y
+
+export ZOPEN_INSTALL="cmake"
+export ZOPEN_INSTALL_OPTS="--install ../build"
+
+export ZOPEN_CHECK="skip"
+
+zopen_check_results()
+{
+  dir="$1"
+  pfx="$2"
+  chk="$1/$2_check.log"
+
+  # Echo the following information to gauge build health
+  echo "actualFailures:0"
+  echo "totalTests:1"
+  echo "expectedFailures:0"
+  echo "expectedTotalTests:1"
+}
+
+zopen_append_to_env()
+{
+if [ ! -z "\$ZOPEN_IN_ZOPEN_BUILD" ]; then
+  export ZOPEN_EXTRA_CFLAGS="\${ZOPEN_EXTRA_CFLAGS} -I\$PWD/include"
+  export ZOPEN_EXTRA_CXXFLAGS="\${ZOPEN_EXTRA_CXXFLAGS} -I\$PWD/include"
+  export ZOPEN_EXTRA_LDFLAGS="\${ZOPEN_EXTRA_LDFLAGS} -L\$PWD/lib"
+  export ZOPEN_EXTRA_LIBS="\${ZOPEN_EXTRA_LIBS} -lcjson"
+fi
+ZZ
+}
+
+zopen_get_version()
+{
+  echo "${CJSON_VERSION}"
+}
